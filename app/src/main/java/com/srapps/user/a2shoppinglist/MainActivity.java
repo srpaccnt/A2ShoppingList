@@ -1,5 +1,6 @@
 package com.srapps.user.a2shoppinglist;
 
+import android.arch.lifecycle.ViewModelProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -31,12 +32,25 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     List<String>dataS;
     Button b;
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+    }
 
-
-
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
