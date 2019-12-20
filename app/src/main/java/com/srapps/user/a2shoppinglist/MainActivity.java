@@ -1,6 +1,7 @@
 package com.srapps.user.a2shoppinglist;
 
 import android.arch.lifecycle.ViewModelProvider;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,25 +24,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxListener{
     TextView tView;
     RecyclerView myList;
     List<String>shoppingList;
     private RecyclerView.Adapter myAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    List<String>dataS;
+    ArrayList<String>dataS;
     Button b;
+    Bundle bundle;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        bundle = new Bundle(outState);
+
     }
 
     @Override
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         myList.addItemDecoration(new DividerItemDecoration(myList.getContext(),DividerItemDecoration.VERTICAL));
         layoutManager = new LinearLayoutManager(this);
         myList.setLayoutManager(layoutManager);
-
+        dataS.add("Hello");
         myAdapter = new ListAdapter(dataS);
         myList.setAdapter(myAdapter);
 
@@ -97,12 +105,14 @@ public class MainActivity extends AppCompatActivity {
                         tView.clearComposingText();
                     }
                 });
+
+
+
+
                 break;
             case R.id.first_list:
                 setContentView(R.layout.activity_main);
                 updateList();
-
-
                 break;
         }
         return true;
@@ -118,8 +128,12 @@ public class MainActivity extends AppCompatActivity {
         myList.addItemDecoration(new DividerItemDecoration(myList.getContext(),DividerItemDecoration.VERTICAL));
         layoutManager = new LinearLayoutManager(this);
         myList.setLayoutManager(layoutManager);
-        myAdapter = new ListAdapter(dataS);
+        myAdapter = new ListAdapter(dataS,this);
         myList.setAdapter(myAdapter);
+
+
+
+
 
 
     }
@@ -128,7 +142,12 @@ public class MainActivity extends AppCompatActivity {
         dataS.add((String)tView.getText());
         tView.clearComposingText();
 
+
+    }
+
+    @Override
+    public void onCheckClick(int position) {
+        dataS.get(position);
     }
 }
-
 
