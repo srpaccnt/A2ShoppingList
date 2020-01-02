@@ -3,6 +3,7 @@ package com.srapps.user.a2shoppinglist;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
         this.mDataset = aList;
         this.cBoxListener = cBoxListener;
 
+
+
     }
 
 
@@ -33,11 +36,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
         public CheckBox cBox;
         Drawable a = new ColorDrawable(Color.TRANSPARENT);
         CBoxListener cBoxListener;
+        private final String KEY_RECYCLER_STATE = "recycler state";
+        private RecyclerView mRecyclerView;
+        private static Bundle mBundleRecyclerViewState;
         public MyViewHolder(View v,CBoxListener cBoxListener) {
             super(v);
             textView = (CheckedTextView) v.findViewById(R.id.appTextViewCBox);
             this.cBoxListener = cBoxListener;
             itemView.setOnClickListener(this);
+
 
 
 
@@ -61,6 +68,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
                 textView.setCheckMarkDrawable(R.drawable.tempboxsr);
             }
         }
+
+
     }
 
 
@@ -88,9 +97,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
+    public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
 
         myViewHolder.textView.setText(mDataset.get(i));
+        myViewHolder.textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mDataset.remove(myViewHolder.getLayoutPosition());
+                notifyDataSetChanged();
+                return true;
+            }
+        });
     }
     public interface CBoxListener{
         void onCheckClick(int position);
