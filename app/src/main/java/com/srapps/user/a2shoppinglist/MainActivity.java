@@ -2,6 +2,7 @@ package com.srapps.user.a2shoppinglist;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -246,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
         tView = findViewById(R.id.addIText);
         cView = findViewById(R.id.appTextViewCBox);
@@ -260,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
         myList.setLayoutManager(layoutManager);
         myAdapter = new ListAdapter(dataS,this);
         myList.setAdapter(myAdapter);
+
 
 
 
@@ -285,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
             case R.id.add_product:
                 setContentView(R.layout.add_item);
                 b = findViewById(R.id.button2);
-                backToItems= findViewById(R.id.back);
                 tView = findViewById(R.id.addIText);
                 String[]SHOPPING_ITEMS = {
                         "Bread","Grapes","Ketchup",
