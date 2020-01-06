@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -20,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
@@ -35,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,19 +46,26 @@ import java.util.Scanner;
 
 
 public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxListener{
-    EditText tView;
+    AutoCompleteTextView tView;
     RecyclerView myList;
     List<String>shoppingList;
     CheckedTextView cView;
-    private RecyclerView.Adapter myAdapter;
+    private ListAdapter myAdapter;
     private RecyclerView.LayoutManager layoutManager;
     ArrayList<String>dataS;
     private Parcelable recyclerViewState;
     private final String KEY_RECYCLER_STATE = "recycler_state";
     int backButtonCount=0;
     Button clearButton;
+    FloatingActionButton addButton;
+    List<String> removed;
     Scanner as;
-
+    EditText quantity;
+    Button backToItems;
+    Button b;
+    Bundle bundle = null;
+    Button c;
+        private static String FILE_NAME ="example.txt";
 
     @Override
     protected void onPause() {
@@ -65,10 +75,7 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
         bundle.putParcelable(KEY_RECYCLER_STATE, recyclerViewState);
     }
 
-    Button b;
-    Bundle bundle = null;
-    Button c;
-    private static String FILE_NAME ="example.txt";
+
 
 
     public void save(){
@@ -78,13 +85,12 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
         try {
             for(int i=0; i<dataS.size(); i++){
                 text+= dataS.get(i).toString()+ "\n";
-                Log.d("hi",dataS.size()+"");
             }
+
             stream = openFileOutput(FILE_NAME,MODE_PRIVATE);
             stream.write(text.getBytes());
 
 
-            Toast.makeText(this, FILE_NAME,Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -143,15 +149,11 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
     }
 
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        dataS.clear();
-//        recyclerViewState = bundle.getParcelable(KEY_RECYCLER_STATE);
-//        bundle.putParcelable(KEY_RECYCLER_STATE,recyclerViewState);
-//
-//
-//    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+     save();
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -172,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
             recyclerViewState = bundle.getParcelable(KEY_RECYCLER_STATE);
             myList.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         }
+        save();
+
     }
 
 
@@ -194,19 +198,35 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
     @Override
     protected void onStart() {
         super.onStart();
+
+
+
         FileInputStream inputStream = null;
+        dataS = new ArrayList();
+
         try {
+
             inputStream = openFileInput(FILE_NAME);
+
             InputStreamReader isr = new InputStreamReader(inputStream);
             BufferedReader br = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();
             String text;
-
             while (((text = br.readLine()) != null)) {
                 sb.append(text + " ");
+
             }
 
-            dataS.add(sb.toString());
+            Scanner aScanner = new Scanner(sb.toString());
+            while(aScanner.hasNext()){
+
+                    dataS.add(aScanner.next());
+                }
+            
+            save();
+            myAdapter = new ListAdapter(dataS,this);
+            myList.setAdapter(myAdapter);
+
 
 
 
@@ -216,15 +236,22 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Log.d("on Start","on start");
+
+
+
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tView = findViewById(R.id.addIText);
         cView = findViewById(R.id.appTextViewCBox);
-        dataS = new ArrayList();
-        shoppingList = new ArrayList();
+        dataS = new ArrayList<String>();
+        shoppingList = new ArrayList<String>();
+        removed = new ArrayList<String>();
 
         myList = findViewById(R.id.recycler_view);
         myList.setVisibility(View.VISIBLE);
@@ -244,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
 
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_menu,menu);
@@ -257,24 +285,51 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
             case R.id.add_product:
                 setContentView(R.layout.add_item);
                 b = findViewById(R.id.button2);
-                c = findViewById(R.id.button);
+                backToItems= findViewById(R.id.back);
                 tView = findViewById(R.id.addIText);
+                String[]SHOPPING_ITEMS = {
+                        "Bread","Grapes","Ketchup",
+                        "Apples","Oranges","Cake","Chocolate Bar",
+                        "Eggs","Milk","Popcorn","Onions","Garlic","Salt",
+                        "Sugar","Crisps","Pizza","Washing Up Liquid",
+                        "Tissues","Potatoes","Apple Juice","Orange Juice","" +
+                        "Drinks","Tomatoes","Fairy Liquid","Pasta","Pizza","Waffles","Bacon",
+                        "Sandwiches","Garlic"};
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                        android.R.layout.simple_dropdown_item_1line, SHOPPING_ITEMS);
+
+                tView.setAdapter(adapter);
+
+
+
+
+
+//                c = findViewById(R.id.button);
                 cView = findViewById(R.id.appTextViewCBox);
+                quantity = findViewById(R.id.editText);
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dataS.add(tView.getText().toString());
-                        tView.clearComposingText();
+                        dataS.add(tView.getText().toString()+"" +
+                                "("+quantity.getText().toString()+")");
+                        Toast.makeText(getApplicationContext(),"Item added",Toast.LENGTH_SHORT).show();
+                        tView.setText("");
+                        quantity.setText("");
                         save();
+
                     }
                 });
 
-                c.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        load(cView);
-                    }
-                });
+
+
+
+//                c.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        load(cView);
+//                    }
+//                });
                 clearButton = findViewById(R.id.button3);
                 clearButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -296,9 +351,11 @@ public class MainActivity extends AppCompatActivity implements ListAdapter.CBoxL
     }
 
 
-
+//    public void launchActivity(){
+//        Intent intent = new Intent(this,AddItemActivity.class);
+//        startActivity(intent);
+//    }
     public void updateList(){
-
 
         myList = findViewById(R.id.recycler_view);
         myList.setVisibility(View.VISIBLE);

@@ -16,16 +16,19 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
     private List<String> mDataset;
     private CBoxListener cBoxListener;
+    FileInputStream stream = null;
     public ListAdapter(List<String> aList,CBoxListener cBoxListener){
         this.mDataset = aList;
         this.cBoxListener = cBoxListener;
-
-
 
     }
 
@@ -98,7 +101,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
-
         myViewHolder.textView.setText(mDataset.get(i));
         myViewHolder.textView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -112,6 +114,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder>{
     public interface CBoxListener{
         void onCheckClick(int position);
     }
+
 
 
 
